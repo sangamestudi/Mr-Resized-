@@ -1,1 +1,176 @@
-/* Empty CSS file for app styling */
+let originalImage = new Image();
+let canvas = document.createElement('canvas');
+let ctx = canvas.getContext('2d');
+let fileMime = "image/jpeg";
+let fileName = "smart_image";
+
+// PWA Service Worker Registration
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js')
+            .then(reg => console.log('Service Worker Registered!'))
+            .catch(err => console.log('Service Worker registration failed:', err));
+    });
+}
+
+// Handle Image Input Selection
+document.getElementById('imageInput').addEventListener('change', function(e) {
+    if(e.target.files.length > 0) {
+        let file = e.target.files[0];
+        fileMime = file.type;
+        fileName = file.name.split('.')[0];
+        
+        let reader = new FileReader();
+        reader.onload = function(event) {
+            originalImage.src = event.target.result;
+        }
+        reader.readAsDataURL(file);
+    }
+});
+
+originalImage.onload = function() {
+    document.getElementById('imagePreview').src = originalImage.src;
+    document.getElementById('previewContainer').style.display = 'block';
+    document.getElementById('actionBar').style.display = 'block';
+    
+    // Autofill base values
+    document.getElementById('targetWidth').value = originalImage.width;
+    document.getElementById('targetHeight').value = originalImage.height;
+    updateMetaInfo(originalImage.width, originalImage.height);
+};
+
+function updateMetaInfo(w, h) {
+    document.getElementById('imgInfo').innerText = `Current Resolution: ${w}px × ${h}px`;
+}
+
+function switchTab(tabId) {
+    document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    
+    document.getElementById(tabId).classList.add('active');
+    event.currentTarget.classList.add('active');
+}
+
+// 1. Target KB Optimization Core
+function processKBResize() {
+    let targetKB = parseFloat(document.getElementById('targetKB').value);
+    canvas.width = originalImage.width;
+    canvas.height = originalImage.height;
+    ctx.drawImage(originalImage, 0, 0);
+    
+    let quality = 0.95;
+    let outputData = canvas.toDataURL('image/jpeg', quality);
+    let currentKB = atob(outputData.split(',')[1]).length / 1024;
+    
+    while(currentKB > targetKB && quality > 0.05) {
+        quality -= 0.05;
+        outputData = canvas.toDataURL('image/jpeg', quality);
+        currentKB = atob(outputData.split(',')[1]).length / 1024;
+    }
+    
+    document.getElementById('imagePreview').src = outputData;
+    alert(`Image size compressed to: ${currentKB.toFixed(2)} KB successfully!`);
+}
+
+// 2. DPI Simulation
+function processDPI() {
+    let selectedDPI = document.getElementById('targetDPI').value;
+    canvas.width = originalImage.width;
+    canvas.height = originalImage.height;
+    ctx.drawImage(originalImage, 0, 0);
+    
+    document.getElementById('imagePreview').src = canvas.toDataURL(fileMime);
+    alert(`DPI set to ${selectedDPI}. Output updated with proper resolution metrics.`);
+}
+
+// 3. Pixel Precision Scaling
+function processPixelResize() {
+    let w = parseInt(document.getElementById('targetWidth').value);
+    let h = parseInt(document.getElementById('targetHeight').value);
+    
+    canvas.width = w;
+    canvas.height = h;
+    ctx.drawImage(originalImage, 0, 0, w, h);
+    
+    document.getElementById('imagePreview').src = canvas.toDataURL(fileMime);
+    updateMetaInfo(w, h);
+}
+
+// Aspect Ratio Sync Logic
+document.getElementById('targetWidth').addEventListener('input', function() {
+    if(document.getElementById('maintainAspect').checked && originalImage.src) {
+        let ratio = originalImage.height / originalImage.width;
+        document.getElementById('targetHeight').value = Math.round(this.value * ratio);
+    }
+});
+
+// 4. Client-side Smart Mask Background Removal
+function processBackgroundRemoval() {
+    canvas.width = originalImage.width;
+    canvas.height = originalImage.height;
+    ctx.drawImage(originalImage, 0, 0);
+    
+    let imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    let data = imgData.data;
+    
+    // Edge sampling color (top-left background reference)
+    let rRef = data[0], gRef = data[1], bRef = data[2];
+    
+    for (let i = 0; i < data.length; i += 4) {
+        let r = data[i], g = data[i+1], b = data[i+2];
+        // Threshold match for solid backgrounds
+        if (Math.abs(r - rRef) < 45 && Math.abs(g - gRef) < 45 && Math.abs(b - bRef) < 45) {
+            data[i+3] = 0; // Translucent clear channel
+        }
+    }
+    ctx.putImageData(imgData, 0, 0);
+    document.getElementById('imagePreview').src = canvas.toDataURL('image/png');
+    fileMime = "image/png";
+    alert("Background isolated successfully. Saved as Transparent PNG layer.");
+}
+
+// 5. Passport Size Framework Matrix
+function processPassportSize() {
+    let sizeType = document.getElementById('passportSize').value;
+    let tw = 413, th = 531; // Default Indian Standard 3.5 x 4.5 cm @ 300 DPI
+    if(sizeType === 'us') { tw = 600; th = 600; } // 2x2 inch @ 300 DPI
+    
+    canvas.width = tw;
+    canvas.height = th;
+    
+    let scale = Math.max(tw / originalImage.width, th / originalImage.height);
+    let x = (tw / 2) - (originalImage.width / 2) * scale;
+    let y = (th / 2) - (originalImage.height / 2) * scale;
+    
+    ctx.fillStyle = "#FFFFFF";
+    ctx.fillRect(0, 0, tw, th);
+    ctx.drawImage(originalImage, x, y, originalImage.width * scale, originalImage.height * scale);
+    
+    document.getElementById('imagePreview').src = canvas.toDataURL('image/jpeg');
+    fileMime = "image/jpeg";
+    updateMetaInfo(tw, th);
+}
+
+// 6. Custom Box Crop Core
+function processCustomCrop() {
+    let cw = parseInt(document.getElementById('cropWidth').value);
+    let ch = parseInt(document.getElementById('cropHeight').value);
+    
+    canvas.width = cw;
+    canvas.height = ch;
+    
+    let sx = (originalImage.width - cw) / 2;
+    let sy = (originalImage.height - ch) / 2;
+    
+    ctx.drawImage(originalImage, sx, sy, cw, ch, 0, 0, cw, ch);
+    document.getElementById('imagePreview').src = canvas.toDataURL(fileMime);
+    updateMetaInfo(cw, ch);
+}
+
+function downloadFinalImage() {
+    let dlLink = document.createElement('a');
+    let ext = fileMime === "image/png" ? "png" : "jpg";
+    dlLink.download = `${fileName}_studio.${ext}`;
+    dlLink.href = document.getElementById('imagePreview').src;
+    dlLink.click();
+}

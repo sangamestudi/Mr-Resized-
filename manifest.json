@@ -1,160 +1,22 @@
 {
-  "name": "Mr-Resized - Image Manipulation Tool",
-  "short_name": "Mr-Resized",
-  "description": "Professional image resizing, compression, background removal, and editing tool. Resize images by KB/MB, change DPI, crop, remove backgrounds, and create passport photos.",
-  "start_url": "/",
-  "scope": "/",
+  "name": "Smart Image Studio Professional",
+  "short_name": "ImageStudio",
+  "description": "Resize image in KB, DPI, Pixels, Remove Background & Passport Photo maker tool.",
+  "start_url": "index.html",
   "display": "standalone",
-  "orientation": "portrait-primary",
-  "theme_color": "#6366f1",
   "background_color": "#ffffff",
-  "categories": ["productivity", "utilities"],
-  
+  "theme_color": "#0078d4",
+  "orientation": "any",
   "icons": [
     {
-      "src": "icons/icon-72x72.png",
-      "sizes": "72x72",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icons/icon-96x96.png",
-      "sizes": "96x96",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icons/icon-128x128.png",
-      "sizes": "128x128",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icons/icon-144x144.png",
-      "sizes": "144x144",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icons/icon-152x152.png",
-      "sizes": "152x152",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icons/icon-192x192.png",
+      "src": "https://img.icons8.com/fluid/192/image-editor.png",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any"
+      "type": "image/png"
     },
     {
-      "src": "icons/icon-384x384.png",
-      "sizes": "384x384",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icons/icon-512x512.png",
+      "src": "https://img.icons8.com/fluid/512/image-editor.png",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any"
-    },
-    {
-      "src": "icons/icon-maskable-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "maskable"
-    },
-    {
-      "src": "icons/icon-maskable-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
+      "type": "image/png"
     }
-  ],
-  
-  "screenshots": [
-    {
-      "src": "screenshots/screenshot-540x720.png",
-      "sizes": "540x720",
-      "type": "image/png",
-      "form_factor": "narrow"
-    },
-    {
-      "src": "screenshots/screenshot-1280x720.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide"
-    }
-  ],
-  
-  "shortcuts": [
-    {
-      "name": "Resize Image",
-      "short_name": "Resize",
-      "description": "Quickly resize your image",
-      "url": "/?tool=resize-pixels",
-      "icons": [
-        {
-          "src": "icons/resize-icon-96x96.png",
-          "sizes": "96x96",
-          "type": "image/png"
-        }
-      ]
-    },
-    {
-      "name": "Remove Background",
-      "short_name": "Remove BG",
-      "description": "Remove background from image",
-      "url": "/?tool=remove-bg",
-      "icons": [
-        {
-          "src": "icons/bg-remove-icon-96x96.png",
-          "sizes": "96x96",
-          "type": "image/png"
-        }
-      ]
-    },
-    {
-      "name": "Passport Photo",
-      "short_name": "Passport",
-      "description": "Create passport size photos",
-      "url": "/?tool=passport-size",
-      "icons": [
-        {
-          "src": "icons/passport-icon-96x96.png",
-          "sizes": "96x96",
-          "type": "image/png"
-        }
-      ]
-    }
-  ],
-  
-  "share_target": {
-    "action": "/share",
-    "method": "POST",
-    "enctype": "multipart/form-data",
-    "params": {
-      "files": [
-        {
-          "name": "image",
-          "accept": ["image/*"]
-        }
-      ]
-    }
-  },
-  
-  "file_handlers": [
-    {
-      "action": "/",
-      "accept": {
-        "image/png": [".png"],
-        "image/jpeg": [".jpg", ".jpeg"],
-        "image/webp": [".webp"],
-        "image/gif": [".gif"]
-      }
-    }
-  ],
-  
-  "prefer_related_applications": false
+  ]
 }

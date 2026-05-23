@@ -1,228 +1,136 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Mr-Resized - Professional Image Resizing & Editing Tool">
-    <meta name="theme-color" content="#6366f1">
-    <title>Mr-Resized - Image Manipulation Tool</title>
-    
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%236366f1' width='192' height='192'/><text x='50%' y='50%' font-size='100' fill='white' text-anchor='middle' dominant-baseline='middle'>MR</text></svg>">
-    
-    <!-- Stylesheets -->
+    <title>Smart Image Studio - PWA</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0078d4">
 </head>
 <body>
     <div class="app-container">
-        
-        <!-- Header -->
-        <header class="header">
-            <div class="header-content">
-                <h1 class="logo">🖼️ Mr-Resized</h1>
-                <p class="tagline">Professional Image Manipulation Tool</p>
-            </div>
+        <header>
+            <h1>Smart Image Studio</h1>
+            <p>Resize, Compress, Crop & Remove Background Offline</p>
         </header>
 
-        <!-- Main Container -->
         <main class="main-content">
-            
             <!-- Upload Section -->
-            <section class="upload-section">
-                <div class="upload-box" id="uploadBox">
+            <section class="upload-section" id="dropZone">
+                <div class="upload-box">
+                    <p>Image yahan Drag & Drop karein ya niche click karke Select karein</p>
                     <input type="file" id="imageInput" accept="image/*" hidden>
-                    <div class="upload-content">
-                        <span class="upload-icon">📤</span>
-                        <h2>Upload Your Image</h2>
-                        <p>Click to select or drag & drop your image</p>
-                        <p class="file-info">Supported: PNG, JPG, WebP, GIF (Max 50MB)</p>
-                    </div>
+                    <button class="btn btn-primary" onclick="document.getElementById('imageInput').click()">Browse Image</button>
                 </div>
-
-                <!-- Image Preview -->
-                <div id="previewContainer" class="preview-container hidden">
-                    <div class="preview-header">
-                        <h3>Image Preview</h3>
-                        <button class="btn-close" id="btnClose">✕</button>
-                    </div>
-                    <div class="preview-content">
-                        <img id="previewImage" src="" alt="Preview">
-                        <div class="image-info">
-                            <p><strong>Dimension:</strong> <span id="imageDimension">0 x 0</span> px</p>
-                            <p><strong>File Size:</strong> <span id="fileSize">0</span> KB</p>
-                            <p><strong>Format:</strong> <span id="imageFormat">-</span></p>
-                        </div>
-                    </div>
+                <div class="preview-container" id="previewContainer" style="display:none;">
+                    <img id="imagePreview" alt="Preview Image">
+                    <div id="imgInfo" class="img-info"></div>
                 </div>
             </section>
 
             <!-- Tools Section -->
-            <section class="tools-section" id="toolsSection">
-                <h2>Select Your Tool</h2>
-                <div class="tools-grid">
-                    
-                    <!-- Tool 1: Resize in KB -->
-                    <button class="tool-card" data-tool="resize-kb">
-                        <span class="tool-icon">⚙️</span>
-                        <h3>Resize by Size</h3>
-                        <p>Compress to KB/MB</p>
-                    </button>
+            <section class="tools-section">
+                <!-- Navigation Tabs -->
+                <div class="tabs-grid">
+                    <button class="tab-btn active" onclick="switchTab('kb-tab')">Resize KB</button>
+                    <button class="tab-btn" onclick="switchTab('dpi-tab')">Change DPI</button>
+                    <button class="tab-btn" onclick="switchTab('px-tab')">Resize Pixel</button>
+                    <button class="tab-btn" onclick="switchTab('bg-tab')">Remove BG</button>
+                    <button class="tab-btn" onclick="switchTab('passport-tab')">Passport Size</button>
+                    <button class="tab-btn" onclick="switchTab('crop-tab')">Custom Crop</button>
+                </div>
 
-                    <!-- Tool 2: Resize DPI -->
-                    <button class="tool-card" data-tool="resize-dpi">
-                        <span class="tool-icon">📊</span>
-                        <h3>Change DPI</h3>
-                        <p>72 DPI to 300 DPI</p>
-                    </button>
+                <!-- Tab Contents -->
+                <div class="tab-content">
+                    <!-- 1. Resize KB -->
+                    <div id="kb-tab" class="tab-pane active">
+                        <h3>Image Size Compress Karein (KB)</h3>
+                        <div class="input-group">
+                            <label>Target Size (KB):</label>
+                            <input type="number" id="targetKB" value="50" min="1">
+                        </div>
+                        <button class="btn btn-success" onclick="processKBResize()">Apply Compression</button>
+                    </div>
 
-                    <!-- Tool 3: Resize Pixels -->
-                    <button class="tool-card" data-tool="resize-pixels">
-                        <span class="tool-icon">📐</span>
-                        <h3>Resize Pixels</h3>
-                        <p>Custom W × H</p>
-                    </button>
+                    <!-- 2. Change DPI -->
+                    <div id="dpi-tab" class="tab-pane">
+                        <h3>Image DPI Change Karein</h3>
+                        <div class="input-group">
+                            <label>Select DPI:</label>
+                            <select id="targetDPI">
+                                <option value="72">72 DPI (Web Optimize)</option>
+                                <option value="150">150 DPI (Standard Print)</option>
+                                <option value="300" selected>300 DPI (High Quality Print)</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-success" onclick="processDPI()">Apply DPI</button>
+                    </div>
 
-                    <!-- Tool 4: Remove Background -->
-                    <button class="tool-card" data-tool="remove-bg">
-                        <span class="tool-icon">✨</span>
-                        <h3>Remove Background</h3>
-                        <p>Make PNG transparent</p>
-                    </button>
+                    <!-- 3. Resize Pixel -->
+                    <div id="px-tab" class="tab-pane">
+                        <h3>Custom Pixel Dimensions</h3>
+                        <div class="input-row">
+                            <div class="input-group">
+                                <label>Width (px):</label>
+                                <input type="number" id="targetWidth">
+                            </div>
+                            <div class="input-group">
+                                <label>Height (px):</label>
+                                <input type="number" id="targetHeight">
+                            </div>
+                        </div>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="maintainAspect" checked> Maintain Aspect Ratio
+                        </label>
+                        <button class="btn btn-success" onclick="processPixelResize()">Resize Pixels</button>
+                    </div>
 
-                    <!-- Tool 5: Passport Size -->
-                    <button class="tool-card" data-tool="passport-size">
-                        <span class="tool-icon">🪪</span>
-                        <h3>Passport Size</h3>
-                        <p>3.5 × 4.5 cm</p>
-                    </button>
+                    <!-- 4. Remove Background -->
+                    <div id="bg-tab" class="tab-pane">
+                        <h3>AI Background Remover (Smart Transparent Mask)</h3>
+                        <p>Yeh tool image ke solid ya light background ko transparent layer mein badal deta hai.</p>
+                        <button class="btn btn-success" onclick="processBackgroundRemoval()">Remove Background</button>
+                    </div>
 
-                    <!-- Tool 6: Custom Crop -->
-                    <button class="tool-card" data-tool="custom-crop">
-                        <span class="tool-icon">✂️</span>
-                        <h3>Custom Crop</h3>
-                        <p>Flexible cropping</p>
-                    </button>
+                    <!-- 5. Passport Size -->
+                    <div id="passport-tab" class="tab-pane">
+                        <h3>Passport Size Photo Creator</h3>
+                        <div class="input-group">
+                            <label>Standard Sizes:</label>
+                            <select id="passportSize">
+                                <option value="indian">Indian Passport Size (3.5 x 4.5 cm)</option>
+                                <option value="us">US Visa / Stamp Size (2 x 2 inch)</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-success" onclick="processPassportSize()">Format Passport Size</button>
+                    </div>
 
+                    <!-- 6. Custom Crop -->
+                    <div id="crop-tab" class="tab-pane">
+                        <h3>Custom Dimension Crop Tool</h3>
+                        <div class="input-row">
+                            <div class="input-group">
+                                <label>Crop Width (px):</label>
+                                <input type="number" id="cropWidth" value="300">
+                            </div>
+                            <div class="input-group">
+                                <label>Crop Height (px):</label>
+                                <input type="number" id="cropHeight" value="300">
+                            </div>
+                        </div>
+                        <button class="btn btn-success" onclick="processCustomCrop()">Crop Image</button>
+                    </div>
+                </div>
+
+                <!-- Global Download Bar -->
+                <div class="action-bar" id="actionBar" style="display:none;">
+                    <button class="btn btn-download" onclick="downloadFinalImage()">Download Processed Image</button>
                 </div>
             </section>
-
-            <!-- Tool Options Panel -->
-            <section class="tool-options" id="toolOptions" style="display: none;">
-                <div class="options-header">
-                    <h3 id="toolTitle">Tool Options</h3>
-                    <button class="btn-close" id="btnCloseOptions">✕</button>
-                </div>
-
-                <!-- Resize by KB Options -->
-                <div id="options-resize-kb" class="tool-options-content hidden">
-                    <label>Target File Size (KB):</label>
-                    <input type="number" id="targetSizeKB" min="10" max="10000" value="100" class="input-field">
-                    <p class="info-text">⚠️ Quality will be reduced to meet target size</p>
-                    <button class="btn-primary" onclick="applyResizeKB()">Apply Compression</button>
-                </div>
-
-                <!-- Resize DPI Options -->
-                <div id="options-resize-dpi" class="tool-options-content hidden">
-                    <label>Select DPI:</label>
-                    <div class="dpi-options">
-                        <button class="dpi-btn" onclick="setDPI(72)">72 DPI</button>
-                        <button class="dpi-btn" onclick="setDPI(150)">150 DPI</button>
-                        <button class="dpi-btn" onclick="setDPI(300)">300 DPI</button>
-                    </div>
-                    <label>Or Enter Custom DPI:</label>
-                    <input type="number" id="customDPI" min="72" max="600" value="300" class="input-field">
-                    <button class="btn-primary" onclick="applyResizeDPI()">Apply DPI</button>
-                </div>
-
-                <!-- Resize Pixels Options -->
-                <div id="options-resize-pixels" class="tool-options-content hidden">
-                    <div class="input-group">
-                        <label>Width (px):</label>
-                        <input type="number" id="customWidth" min="1" value="800" class="input-field">
-                    </div>
-                    <div class="input-group">
-                        <label>Height (px):</label>
-                        <input type="number" id="customHeight" min="1" value="600" class="input-field">
-                    </div>
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="lockAspectRatio" checked>
-                        Lock Aspect Ratio
-                    </label>
-                    <p class="info-text">Current Ratio: <span id="currentRatio">16:9</span></p>
-                    <button class="btn-primary" onclick="applyResizePixels()">Resize Image</button>
-                </div>
-
-                <!-- Remove Background Options -->
-                <div id="options-remove-bg" class="tool-options-content hidden">
-                    <p class="info-text">🤖 Using AI-based background removal...</p>
-                    <div class="progress-bar" id="bgRemovalProgress" style="display: none;">
-                        <div class="progress-fill"></div>
-                    </div>
-                    <button class="btn-primary" onclick="applyRemoveBackground()">Remove Background</button>
-                </div>
-
-                <!-- Passport Size Options -->
-                <div id="options-passport-size" class="tool-options-content hidden">
-                    <p class="info-text">Standard Passport Size: 3.5 × 4.5 cm (413 × 531 px @ 300 DPI)</p>
-                    <label>Select Format:</label>
-                    <div class="passport-options">
-                        <button class="passport-btn" onclick="applyPassportSize('3.5x4.5')">3.5 × 4.5 cm (India)</button>
-                        <button class="passport-btn" onclick="applyPassportSize('2x2')">2 × 2 inches (USA)</button>
-                        <button class="passport-btn" onclick="applyPassportSize('35x45')">35 × 45 mm (EU)</button>
-                    </div>
-                    <p class="info-text">✂️ Face detection will auto-crop to center</p>
-                    <button class="btn-primary" onclick="applyFaceDetection()">Auto-Crop Face</button>
-                </div>
-
-                <!-- Custom Crop Options -->
-                <div id="options-custom-crop" class="tool-options-content hidden">
-                    <label>Crop Width (px):</label>
-                    <input type="number" id="cropWidth" min="1" value="300" class="input-field">
-                    <label>Crop Height (px):</label>
-                    <input type="number" id="cropHeight" min="1" value="300" class="input-field">
-                    <p class="info-text">📍 Click on image to set crop position</p>
-                    <button class="btn-primary" onclick="applyCrop()">Apply Crop</button>
-                </div>
-
-            </section>
-
-            <!-- Canvas for Processing -->
-            <canvas id="processCanvas" style="display: none;"></canvas>
-
-            <!-- Result Section -->
-            <section class="result-section" id="resultSection" style="display: none;">
-                <div class="result-container">
-                    <h3>Edited Image</h3>
-                    <img id="resultImage" src="" alt="Result">
-                    <div class="result-info">
-                        <p><strong>New Size:</strong> <span id="resultSize">0</span> KB</p>
-                        <p><strong>New Dimension:</strong> <span id="resultDimension">0 x 0</span> px</p>
-                    </div>
-                </div>
-            </section>
-
         </main>
-
-        <!-- Download Section -->
-        <footer class="footer">
-            <div class="footer-buttons">
-                <button class="btn-secondary" id="btnReset">↻ Reset</button>
-                <button class="btn-primary btn-download" id="btnDownload">⬇️ Download Image</button>
-            </div>
-        </footer>
-
     </div>
 
-    <!-- Scripts -->
-    <script src="image-processor.js"></script>
-    <script src="script.js"></script>
-    
-    <!-- PWA Service Worker -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').catch(err => console.log('SW registration failed'));
-        }
-    </script>
+    <script src="app.js"></script>
 </body>
 </html>
